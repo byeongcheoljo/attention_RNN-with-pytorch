@@ -180,4 +180,4 @@ print(xs, ys, lens)
 enc_output, enc_hidden = encoder(xs, lens)
 print(enc_output.size()) # max_length, batch_size, hidden_size
 print(enc_hidden.size())
-####
+
