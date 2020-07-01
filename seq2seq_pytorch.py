@@ -44,7 +44,7 @@ def padSequence(x, max_length):
     else: padded[:len(x)] = x
     return padded
 
-file_name = "/home/byeongcheol/python3_deep_env/pytorch_test/data/eng-fra.txt"
+file_name = "file "
 eng_list = []
 fra_list = []
 for ln in open(file_name, 'rt',encoding="utf-8"):
