@@ -20,7 +20,6 @@ def unicode_to_ascii(s):
 def preprocess_sentence(w):
     w = unicode_to_ascii(w.lower().strip())
 
-    # creating a space between a word and the punctuation following it
     # eg: "he is a boy." => "he is a boy ."
     w = re.sub(r"([?.!,¿])", r" \1 ", w)
     w = re.sub(r'[" "]+', " ", w)
@@ -29,7 +28,6 @@ def preprocess_sentence(w):
     w = re.sub(r"[^a-zA-Z?.!,¿]+", " ", w)
     w = w.rstrip().strip()
 
-    # adding a start and an end token to the sentence, especially sequence to sequence model know when to start and stop predicting.
     #eg: "he is a boy ."  => "<start> he is a boy . <end>"
     w = '<start> ' + w + ' <end>'
     return w
@@ -173,7 +171,7 @@ encoder = Encoder(vocab_inp_size, embedding_dim, hidden_size, batch_size)
 it = iter(dataset)
 x, y, x_len = next(it)
 print(x.shape)
-# sort the batch first to be able to use with pac_pack_sequence
+
 xs, ys, lens = sort_batch(x, y, x_len)
 print(xs, ys, lens)
 enc_output, encoder_hidden = encoder(xs, lens)
@@ -211,17 +209,13 @@ class Decoder(nn.Module):
 
 
         # attention_weights shape == (batch_size, max_length, 1)
-        # we get 1 at the last axis because we are applying score to self.V
         attention_weights = torch.softmax(self.V(score), dim=1)
 
         # context_vector shape after sum == (batch_size, hidden_size)
         context_vector = attention_weights * enc_output
         context_vector = torch.sum(context_vector, dim=1)
 
-        # x shape after passing through embedding == (batch_size, 1, embedding_dim)
         x = self.embedding(x)
-
-        # x shape after concatenation == (batch_size, 1, embedding_dim + hidden_size)
         x = torch.cat((context_vector.unsqueeze(1), x), -1)
 
         # output: (batch_size, 1, hidden_size)
